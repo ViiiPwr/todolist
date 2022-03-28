@@ -1,8 +1,12 @@
 const express = require ("express");
 const bodyParser = require("body-parser");
+const date = require(__dirname+ "/date.js");
+
 const app = express();
 
-var items = ["get up","eat breakfast"];
+let items = ["get up","eat breakfast"];
+let workItems =[];
+
 //using ejs template
 app.set('view engine', 'ejs');
 
@@ -11,36 +15,46 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 app.get("/", function(req, res){
-  var today = new Date();
-// display current day format
-  var options ={
-    weekday: "short",
-    day:"numeric",
-    month:"short"
-  };
-  var day = today.toLocaleDateString("en-US",options);
+
+let day = date;
 
   res.render("list",{
-    kindOfDay: day,
+    // if only want weekday name, change .getDate to .getDay
+    ListTitle: day.getDate(),
     newListItems: items
   });
 
   });
+
 app.post("/",function(req,res){
- var item = req.body.newItem;
- items.push(item);
- res.redirect("/");
+   let item = req.body.newItem;
+
+   if(req.body.list==="Work"){
+     workItems.push(item);
+     res.redirect("/work");
+   }else{
+     items.push(item);
+     res.redirect("/");
+   }
+
 });
 
-  app.listen(3000, function(){
+app.get("/work",function(req,res){
+  res.render("list",{ListTitle:"Work List",newListItems:workItems});
+});
+app.get("/about",function(req,res){
+  res.render("about")
+});
+
+app.listen(3000, function(){
     console.log("server started on port 3000...");
   });
 
 
 
 //****************** display week name**************//
-  // var currentDay = today.getDay();
-  // var Day = "";
+  // let currentDay = today.getDay();
+  // let Day = "";
 // switch (currentDay) {
 //   case 0:
 //     Day="Sunday";
